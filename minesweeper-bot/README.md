@@ -8,7 +8,7 @@ In each step the algorithm does the following:
 2. Determine the coordinates of candidate squares for uncovering
 3. Create a list of all mines arrangements that would not violate the games rules
 4. Mark all squares as mines containing one in every possible arrangement
-5. Reveal all squares which do not contain a mine in a simgle arrangement
+5. Reveal all squares which do not contain a mine in a single arrangement
 
 ```
 new_possible_bomb_arrangements = [[]]
