@@ -27,7 +27,3 @@ for (x, y) in group:
          new_possible_bomb_arrangements.append(arrangement)
   
 ```
-
-2. Create a list to store possible bomb arrangements in selected squares.
-3. Iterating over every selected square and add a possible bomb arrangement for the two cases which are square contains a bomb and the opposite.
-4. After every 
