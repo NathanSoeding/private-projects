@@ -6,12 +6,10 @@ Minesweeper is a logic-based puzzle game where the player aims to clear a grid w
 For each step the algorithm does the following:  
 1. Read the grid
 2. Determine the coordinates of candidate squares for uncovering
-3. Devide them into connected groups
-4. Iterate over every square in a group:
-   - assume the current square contains a bomb
-   - if this assumption does not contradict known information save this bomb arrangement for the next iteration
-   - assume the current square does not contain a bomb
-   - again check for contradictions and save arrangement if necessary
+3. Create a list of all bomb arrangements that would not violate the games rules
+4. Click all squares not containing a bomb in every possible arrangement
+5. Mark all squares containing a bomb in every arangement
+
 ```
 new_possible_bomb_arrangements = [[]]
 
