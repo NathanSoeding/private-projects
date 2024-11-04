@@ -7,19 +7,26 @@ For each step the algorithm does the following:
 1. Read the grid
 2. Determine the coordinates of candidate squares for uncovering
 3. Devide them into connected groups
-4. For every square in a group:
+4. Iterate over every square in a group:
    - assume the current square contains a bomb
-   - if this assumption does not contradict known information save this bomb arrangement for the next square
+   - if this assumption does not contradict known information save this bomb arrangement for the next iteration
    - assume the current square does not contain a bomb
-   - again check for contradictions
+   - again check for contradictions and save arrangement if necessary
 ```
-grid = read_grid()
+new_possible_bomb_arrangements = [[]]
 
-squares = x, y coordinates of candidate squares for uncovering
+for (x, y) in group:
+   possible_bomb_arrangements = new_possible_bomb_arrangements
+   new_possible_bomb_arrangements = [[]]
 
-possible_bomb_arrangements = []
+   for arrangement in possible_bomb_arrangements:
+      arrangement.append(bomb)
+      if check_rules(arrangement):
+         new_possible_bomb_arrangements.append(arrangement)
 
-def try_bomb(
+      arrangement.append(no bomb)
+      if check_rules(arrangement):
+         new_possible_bomb_arrangements.append(arrangement)
   
 ```
 
