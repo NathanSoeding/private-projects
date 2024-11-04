@@ -3,7 +3,7 @@ In 12'th grade i wrote a minesweeper bot that solves the browser version of the 
 
 Minesweeper is a logic-based puzzle game where the player aims to clear a grid without detonating hidden mines. Each square on the grid may hide a mine or display a number indicating how many adjacent squares contain mines. Players reveal squares by clicking; if a mine is uncovered, the game ends. Using the numbers as clues, players deduce the location of mines, marking suspected squares to avoid them, and aim to uncover all safe squares to win.  
 
-For each step the algorithm does the following:  
+In each step the algorithm does the following:  
 1. Read the grid
 2. Determine the coordinates of candidate squares for uncovering
 3. Create a list of all bomb arrangements that would not violate the games rules
