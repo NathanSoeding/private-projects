@@ -1,54 +1,40 @@
-from calendar import c
-from email.headerregistry import Group
-from itertools import count
-from tkinter import Listbox
 from tokenize import group
-from turtle import left
-from numpy import array, product
-from pyautogui import *
-import pyautogui
 import time
-import datetime
 import copy
-import keyboard
-import random
 import win32api, win32con
+import numpy as np
+import mss
 
 field = []
 bombs_found = 0
 
-# Liest ein Feld ein und wenn dies eine 0 ist auch seine Nachbarzellen (Rekursiv)  
-def update_field(y, x):
-    # pix1 für Unterschedidung von u, 1, 2
-    pix1 = pyautogui.pixel(round(473.14 + x * 56.2777), round(259.5 + y * 56.214))
+# Liest ein Feld ein und wenn dies eine 0 ist auch seine Nachbarzellen (Rekursiv)
+def update_field(y, x, screenshot):
+    top, left, lenght = 240 + y * 56.214, 455 + x * 56.214, 56.214
 
-    if pix1 == (25, 118, 210):
+    cell = screenshot[int(top):int(top + lenght), 
+                      int(left):int(left + lenght)]
+
+    if np.any(np.all(cell == np.array([25, 118, 210]), axis=-1)):
         field[y][x] = 1
-    elif pix1 == (56, 142, 60):
+    elif np.any(np.all(cell == np.array([56, 142, 60]), axis=-1)):
         field[y][x] = 2
+    elif np.any(np.all(cell == np.array([211, 47, 47]), axis=-1)):
+        field[y][x] = 3
+    elif np.any(np.all(cell == np.array([123, 31, 162]), axis=-1)):
+        field[y][x] = 4
+    elif np.any(np.all(cell == np.array([255, 143, 0]), axis=-1)):
+        field[y][x] = 5
+    elif np.any(np.all(cell == np.array([0, 151, 167]), axis=-1)):
+        field[y][x] = 6
     else:
-        # pix2 für Unterschedidung von 3, 4, 5 und 0
-        pix2 = pyautogui.pixel(round(476 + x * 56.2777), round(245 + y * 56.214))
-        # pix3 für 6
-        pix3 = pyautogui.pixel(round(467 + x * 56.2777), round(245 + y * 56.214))
+        field[y][x] = 0     
 
-        if pix2 == (211, 47, 47):
-            field[y][x] = 3
-        elif pix2 == (123, 31, 162):
-            field[y][x] = 4
-        elif pix2 == (255, 143, 0):
-            field[y][x] = 5
-        elif pix3 == (0, 151, 167):
-            field[y][x] = 6
-        else:
-            field[y][x] = 0 
-    
-    # Wenn die Zelle 0 ist werden die benachbarten Zellen eingelesen
     if field[y][x] == 0:
         for y_flex in range(-1, 2):
             for x_flex in range(-1, 2):
                 if y+y_flex >= 0 and y+y_flex < len(field) and x+x_flex >= 0 and x+x_flex < len(field[0]) and field[y+y_flex][x+x_flex] == 'u':
-                    update_field(y+y_flex, x+x_flex)
+                    update_field(y+y_flex, x+x_flex, screenshot)
 
 # Gibt die Anzahl an benachbarten Bomben und unbekannten Feldern für ein Feld(x,y) an
 def count_neighbours(y, x, list):
@@ -64,7 +50,7 @@ def count_neighbours(y, x, list):
                     bombs += 1
                 elif list[y+y_flex][x+x_flex] == 'u':
                     unknown += 1
-                elif list [y+y_flex][x+x_flex] == 'k':
+                elif list[y+y_flex][x+x_flex] == 'k':
                     w = 0
                 elif list[y+y_flex][x+x_flex] > 0:
                     numbers += 1
@@ -73,7 +59,7 @@ def count_neighbours(y, x, list):
 
 # Klickt ein Feld(x,y)
 def click_cell(y, x, left_or_right):
-    win32api.SetCursorPos((round(473.14 + x * 56.2777), round(245.107 + y * 56.216)))
+    win32api.SetCursorPos((round(480 + x * 56.214), round(265 + y * 56.214)))
     if left_or_right == 'L':
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
         time.sleep(0.001)
@@ -160,6 +146,7 @@ def start():
     field = []
     global bombs_found
     bombs_found = 0
+    global screenshot
     
     for y in range(14):
         row = []
@@ -169,7 +156,9 @@ def start():
 
     click_cell(6, 8, 'L')
     time.sleep(1)
-    update_field(6, 8)
+    with mss.mss() as sct:
+        screenshot = np.array(sct.grab(sct.monitors[1]))[:, :, :3][:, :, ::-1]
+    update_field(6, 8, screenshot)
 
 # Start
 start()
@@ -179,12 +168,13 @@ loose = 0
 # Hauptschleife
 while True:
     # Wenn Endscreen
-    endscreen = pyautogui.pixel(950, 500)
-    if endscreen == (252, 193, 0) or endscreen == (74, 192, 253) or endscreen == (162, 209, 73):
-        if endscreen == (74, 192, 253):
+    endscreen = screenshot[530, 960]
+
+    if np.array_equal(endscreen, np.array([252, 193, 0])) or np.array_equal(endscreen, np.array([74, 192, 253])) or np.array_equal(endscreen, np.array([162, 209, 73])):
+        if np.array_equal(endscreen, np.array([74, 192, 253])):
             loose += 1
             print(str(win) + " " + str(loose))
-        if endscreen != (162, 209, 73):
+        if not np.array_equal(endscreen, np.array([162, 209, 73])):
             win += 1
             print(str(win) + " " + str(loose))
             click_cell(10, 7,'L')
@@ -262,6 +252,9 @@ while True:
                 if field[y][x] == 'u':
                     click_cell(y, x, 'L')
 
-    time.sleep(.9)
+    time.sleep(1)
+    with mss.mss() as sct:
+        screenshot = np.array(sct.grab(sct.monitors[1]))[:, :, :3][:, :, ::-1]
+
     for cell in remember_update:
-        update_field(cell[0], cell[1])
+        update_field(cell[0], cell[1], screenshot)
