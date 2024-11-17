@@ -1,5 +1,5 @@
 # Platformer Game
-In my first semester I developed this jump and run game in the game engine Unity.
+While i was in my first semester I developed this jump and run game in the game engine Unity.
 
 Challanges I faced were:
 - Logic of the movement system
